@@ -17,6 +17,8 @@ class Ball:
         while(self.yspeed==0):
             self.yspeed = random.randrange(-1,1)
         self.hit_topbottom = False
+        self.hit_bottom = False
+        self.hit_top = False
         
 
     def draw(self):
@@ -24,8 +26,10 @@ class Ball:
         pos = self.canvas.coords(self.id)
         if pos[1] <= 0:
             self.hit_topbottom = True
+            self.hit_top=True
         if pos[3] >= h:
             self.hit_topbottom = True
+            self.hit_bottom = True
         if pos[0] <= 0:
             self.xspeed = 2
         if pos[2] >= w:
@@ -64,12 +68,12 @@ class Paddle:
             self.canvas.bind_all('<KeyPress-Left>', self.move_left)
             self.canvas.bind_all('<KeyPress-Right>', self.move_right)
             self.canvas.bind_all('<KeyPress-Down>', self.stop)
-#            label = canvas.create_text(5, h/2-105, anchor=NW, text="0",fill="white", font=("Ani",50))
+           
         elif player==2:
             self.canvas.bind_all('<KeyPress-a>', self.move_left)
             self.canvas.bind_all('<KeyPress-d>', self.move_right)
             self.canvas.bind_all('<KeyPress-s>', self.stop)
-#            label = canvas.create_text(5, h/2, anchor=NW, text="0",fill="white",font=("Ani",50))
+            
 
     def draw(self):
         self.canvas.move(self.id, self.xspeed, 0)
@@ -86,31 +90,58 @@ class Paddle:
     def stop(self, evt):
         self.xspeed = 0
 
-
+score=0
+score2=0
+while(True):
 # Ablak letrehozasa
-tk = Tk()
-tk.title("PoNG")
-w=480
-h=640
-canvas = Canvas(tk, width=w, height=h, bd=0, bg='black')
-canvas.pack()
-tk.update()
-paddle = Paddle(canvas, 'White',h-15,1)
-paddle2= Paddle(canvas, 'White',0,2)
-ball = Ball(canvas, 'white', 25, paddle, paddle2)
-canvas.create_line(0,h/2+2,w,h/2+2,fill="white",width=4, dash=(2, 4))
+    tk = Tk()
+    tk.title("PoNG")
+    w=480
+    h=640
+    canvas = Canvas(tk, width=w, height=h, bd=0, bg='black')
+    canvas.pack()
+    tk.update()
+    paddle = Paddle(canvas, 'White',h-15,1)
+    paddle2= Paddle(canvas, 'White',0,2)
+    ball = Ball(canvas, 'white', 25, paddle, paddle2)
+    canvas.create_line(0,h/2+2,w,h/2+2,fill="white",width=4, dash=(2, 4))
 
 # Animacio inditasa
-while ball.hit_topbottom == False:
-#canvas.create_line(0,h/2+2,w,h/2+2,fill="white",width=4, dash=(2, 4))
-    ball.draw()
-    paddle.draw()
-    paddle2.draw()
-#    canvas.itemconfig(label, text="Score: "+str(ball.score))
-    tk.update_idletasks()
-    tk.update()
-    time.sleep(0.01)
 
+    label = canvas.create_text(5, h/2-105, anchor=NW, text=score,fill="white", font=("Ani",50))
+    label = canvas.create_text(5, h/2, anchor=NW, text=score2,fill="white",font=("Ani",50))
+    while ball.hit_topbottom == False:
+        ball.draw()
+        paddle.draw()
+        paddle2.draw()
+        tk.update_idletasks()
+        tk.update()
+        time.sleep(0.01)
+        if ball.hit_top==True:
+            score=score+1
+            ball.hit_topbottom == False
+            ball.hit_top==False
+        elif ball.hit_bottom==True:
+            score2=score2+1
+            ball.hit_topbottom == False
+            ball.hit_bottom==False
 # Game Over
-go_label = canvas.create_text(w/2,h/2,text="GAME OVER",font=("Cantarell Ultra-Bold",40), fill="White")
-tk.update()
+    if score==3:
+        go_label = canvas.create_text(w/2,h/2,text="P1 WON",font=("Cantarell Ultra-Bold",40), fill="White")
+        ball.hit_topbottom == True
+        tk.update()
+        time.sleep(10)
+        tk.destroy
+        break
+    elif score2==3:
+        go_label = canvas.create_text(w/2,h/2,text="P2 WON",font=("Cantarell Ultra-Bold",40), fill="White")
+        tk.update()
+        time.sleep(10)
+        tk.destroy
+        break
+    else:
+        go_label = canvas.create_text(w/2,h/2,text="GAME OVER",font=("Cantarell Ultra-Bold",40), fill="White")
+        tk.update()
+        time.sleep(2)
+        ball.hit_topbottom=False;
+        tk.destroy()
